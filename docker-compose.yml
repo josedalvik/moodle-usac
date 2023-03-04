@@ -1,0 +1,41 @@
+version: "1.1"
+services:
+  db:
+    build: 
+      context: db-mysql
+      args:
+        MOODLE_USER: "laplace"
+        MOODLE_USER_FIRSTNAME: "Pierre"
+        MOODLE_USER_LASTNAME: "Simon"
+        MOODLE_USER_EMAIL: "pierre.simon@transformada.laplace"
+        MOODLE_USER_PASSWORD: "laplace2600"
+    image: db
+    container_name: db-capacitacion
+    volumes:
+      - capacitacion-mysql:/var/lib/mysql
+    restart: unless-stopped
+    networks:
+      - moodle
+  html:
+    build: 
+      context: html-moodle
+      args:
+        MOODLE_DB_IP: "db-capacitacion"
+        MOODLE_PUBLIC_URL: "http://localhost:8000/"
+        MOODLE_HTML: "/var/www/html"
+    image: html-moodle
+    container_name: moodle-capacitacion
+    depends_on:
+      - db
+    volumes:
+      - capacitacion-html:/var/www/
+    restart: unless-stopped
+    networks:
+      - moodle
+    ports:
+      - "8000:80"
+volumes:
+  capacitacion-mysql:
+  capacitacion-html:
+networks:
+    moodle:
